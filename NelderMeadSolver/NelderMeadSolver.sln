@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NelderMeadSolver", "NelderMeadSolver\NelderMeadSolver.vcxproj", "{A4D9522A-0772-4C2D-8A15-996F4DE8248D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientForNMSolver", "ClientForNMSolver\ClientForNMSolver.vcxproj", "{C311FBCD-67E2-4D70-995D-DAA55407FFE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A4D9522A-0772-4C2D-8A15-996F4DE8248D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A4D9522A-0772-4C2D-8A15-996F4DE8248D}.Debug|Win32.Build.0 = Debug|Win32
+		{A4D9522A-0772-4C2D-8A15-996F4DE8248D}.Release|Win32.ActiveCfg = Release|Win32
+		{A4D9522A-0772-4C2D-8A15-996F4DE8248D}.Release|Win32.Build.0 = Release|Win32
+		{C311FBCD-67E2-4D70-995D-DAA55407FFE1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C311FBCD-67E2-4D70-995D-DAA55407FFE1}.Debug|Win32.Build.0 = Debug|Win32
+		{C311FBCD-67E2-4D70-995D-DAA55407FFE1}.Release|Win32.ActiveCfg = Release|Win32
+		{C311FBCD-67E2-4D70-995D-DAA55407FFE1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

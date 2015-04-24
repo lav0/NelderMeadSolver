@@ -1,0 +1,9 @@
+﻿Build started 24.04.2015 15:17:58.
+     1>Project "D:\projects_collateral\projects\testings\NelderMeadSolver\ClientForNMSolver\ClientForNMSolver.vcxproj" on node 2 (Clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\ClientForNMSolver.lastbuildstate".
+     1>Done Building Project "D:\projects_collateral\projects\testings\NelderMeadSolver\ClientForNMSolver\ClientForNMSolver.vcxproj" (Clean target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.15
