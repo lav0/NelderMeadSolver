@@ -113,16 +113,9 @@ void SimplexTriple::replace_maximum(const Point& a_new_point)
 //
 //
 {
-  if (m_p_max == &m_1) {
-    m_1 = a_new_point;
-  } else if (m_p_max == &m_2) {
-    m_2 = a_new_point;
-  } else if (m_p_max == &m_3) {
-    m_3 = a_new_point;
-  } else { 
-    _ASSERT(false); 
-  }
-  
+  auto t = const_cast<Point*>(m_p_max);
+  *t = a_new_point;
+
   did_change();
 }
 

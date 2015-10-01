@@ -6,6 +6,8 @@
 #include <memory>
 #include <mutex>
 #include <functional>
+#include <algorithm>
+#include <assert.h>
 
 static double alfa() { return 1.0; }
 static double gamma() { return 2.0; }
@@ -64,9 +66,9 @@ private:
 
   Point m_1, m_2, m_3;
 
-  mutable const Point *m_p_min;
-  mutable const Point *m_p_mid;
-  mutable const Point *m_p_max;
+  mutable const Point * m_p_min;
+  mutable const Point * m_p_mid;
+  mutable const Point * m_p_max;
 
   mutable bool m_b_points_ordered;
   mutable bool m_b_centroid_calculated;
