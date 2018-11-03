@@ -10,7 +10,7 @@
 
 //=============================================================================
 SimplexTriple::SimplexTriple(  
-  std::function<double(double, double)> obj_function,
+  std::function<double(const VariableSetPtr&)> obj_function,
   const Point& a_p1, 
   const Point& a_p2, 
   const Point& a_p3
@@ -40,12 +40,21 @@ void SimplexTriple::did_change()
 }
   
 //=============================================================================
-double SimplexTriple::value_in_point(const Point& a) const
+double SimplexTriple::value_in_point(const VariableSetPtr& vars) const
 //
 //
 //
 {
-  return m_objective_function(a.X, a.Y);
+  /*auto a1 = dynamic_cast<Point*>(vars.get());
+  auto a = dyna*/
+  return m_objective_function(vars);
+}
+
+//=============================================================================
+double SimplexTriple::value_in_point(const Point& p) const
+{
+  auto vars = (VariableSetPtr) std::make_unique<Point>(p);
+  return m_objective_function(vars);
 }
 
 //=============================================================================
@@ -108,13 +117,14 @@ const double SimplexTriple::maximum_value() const
 }
 
 //=============================================================================
-void SimplexTriple::replace_maximum(const Point& a_new_point)
+void SimplexTriple::replace_maximum(const VariableSetPtr& a_new_point)
 //
 //
 //
 {
+  auto p = dynamic_cast<Point*>(a_new_point.get());
   auto t = const_cast<Point*>(m_p_max);
-  *t = a_new_point;
+  *t = *p;
 
   did_change();
 }
@@ -203,36 +213,36 @@ void SimplexTriple::calculate_centroid() const
 
   double d_coef = 0.5;
 
-  m_p_centroid.reset(new Point( d_coef * (*m_p_min + *m_p_mid)));
+  m_p_centroid.reset(new Point(d_coef * (*m_p_min + *m_p_mid)));
 
   m_b_centroid_calculated = true;
 }
 
 //=============================================================================
-Point SimplexTriple::reflection()
+VariableSetPtr SimplexTriple::reflection()
 //
 //
 //
 {
-  return general_move(alfa());  
+  return std::make_unique<Point>(general_move(alfa()));  
 }
 
 //=============================================================================
-Point SimplexTriple::expansion()
+VariableSetPtr SimplexTriple::expansion()
 //
 //
 //
 {
-  return general_move(gamma());  
+  return std::make_unique<Point>(general_move(gamma()));
 }
 
 //=============================================================================
-Point SimplexTriple::contraction()
+VariableSetPtr SimplexTriple::contraction()
 //
 //
 //
 {
-  return general_move(rho());  
+  return std::make_unique<Point>(general_move(rho()));
 }
 
 //=============================================================================
@@ -272,7 +282,8 @@ void SimplexTriple::calculate_deviation() const
 //
 //
 {
-  Point centre(get_gravity_centre());
+  auto var = get_gravity_centre();
+  Point centre(dynamic_cast<Point&>(*var));
 
   double dev1 = point_norm(centre - m_1);
   double dev2 = point_norm(centre - m_2);
@@ -301,11 +312,11 @@ double SimplexTriple::get_deviation() const
 }
 
 //=============================================================================
-Point SimplexTriple::get_gravity_centre() const
+VariableSetPtr SimplexTriple::get_gravity_centre() const
 //
 //
 //
 {
   double coef = 1.0 / 3.0;
-  return Point(coef * (m_1 + m_2 + m_3));
+  return std::make_unique<Point>(coef * (m_1 + m_2 + m_3));
 }

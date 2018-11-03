@@ -1,15 +1,31 @@
 #pragma once
 
 #include "stdafx.h"
+#include "VariableSet.h"
 
 
+//struct Point
+//{
+//  Point(double a_x, double a_y);
+//
+//  double X;
+//  double Y;
+//};
 
-struct Point
+struct Point : public IVariableSet
 {
-  Point(double a_x, double a_y);
-
-  double X;
-  double Y;
+    ~Point() override {};
+    Point(double a_x, double a_y);
+    Point(const Point& a) : Point(a.X, a.Y) {}
+    Point(const VariableSet<2>& a) : Point(a.values_[0], a.values_[1]) {}
+    Point& operator=(const Point& p) {
+        X = p.X;
+        Y = p.Y;
+        return *this; 
+    }
+    
+    double X;
+    double Y;
 };
 
 //=============================================================================

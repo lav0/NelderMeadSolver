@@ -12,7 +12,7 @@ class Solver
 public:
 
   Solver(
-    std::function<double(double, double)> objective_function,
+    std::function<double(const VariableSetPtr&)> objective_function,
     double xmin, 
     double xmax, 
     double ymin, 
@@ -22,8 +22,7 @@ public:
   bool solve(
     bool a_multithreading,
     double a_tolerance, 
-    double& a_x_out, 
-    double& a_y_out, 
+    Point& a_output,
     double& a_value
   );
 
@@ -34,15 +33,19 @@ private:
     eArea a_area
   );
 
+  std::unique_ptr<ISimplex> getSimplex(const Point& a_p1,
+                                       const Point& a_p2,
+                                       const Point& a_p3) const;
+
 private:
     
   Bounds m_bounds;
 
-  std::function<double(double, double)> m_objective_function;
+  std::function<double(const VariableSetPtr&)> m_objective_function;
 
-  bool m_found;
-  Point m_found_solution;
-  double m_found_value;
+  bool           m_found;
+  VariableSetPtr m_found_solution;
+  double         m_found_value;
 
   std::mutex m_mutex;
 

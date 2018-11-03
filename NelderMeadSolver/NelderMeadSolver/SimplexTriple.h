@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Point.h"
+#include "ISimplex.h"
 #include <memory>
 #include <mutex>
 #include <functional>
@@ -16,39 +17,42 @@ static double sigma() { return 0.5; }
 
 
 
-class SimplexTriple
+class SimplexTriple : public ISimplex
 {
 public:
 
   SimplexTriple(
-    std::function<double(double, double)> obj_function,
+    std::function<double(const VariableSetPtr&)> obj_function,
     const Point& a_p1, 
     const Point& a_p2, 
     const Point& a_p3
   );
 
+  ~SimplexTriple() override {}
+
   const Point& minimum() const;
   const Point& middle() const;
   const Point& maximum() const;
 
-  const double minimum_value() const;
-  const double middle_value() const;
-  const double maximum_value() const;
+  const double minimum_value() const override;
+  const double middle_value() const override;
+  const double maximum_value() const override;
 
-  void replace_maximum(const Point& a_new_point);
+  void replace_maximum(const VariableSetPtr& a_new_point) override;
 
   Point get_centroid();
-  Point get_gravity_centre() const;
+  VariableSetPtr get_gravity_centre() const override;
 
-  Point reflection();
-  Point expansion();
-  Point contraction();
+  VariableSetPtr reflection() override;
+  VariableSetPtr expansion() override;
+  VariableSetPtr contraction() override;
 
-  void reduce();
+  void reduce() override;
   
-  double value_in_point(const Point& a) const;
+  double value_in_point(const VariableSetPtr& a) const override;
+  double value_in_point(const Point& p) const;
 
-  double get_deviation() const;
+  double get_deviation() const override;
 
 private:
 
@@ -62,7 +66,7 @@ private:
 
 private:
   
-  std::function<double(double, double)> m_objective_function;
+  std::function<double(const VariableSetPtr&)> m_objective_function;
 
   Point m_1, m_2, m_3;
 
