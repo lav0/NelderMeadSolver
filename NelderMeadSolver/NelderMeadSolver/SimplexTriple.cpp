@@ -46,8 +46,6 @@ double SimplexTriple::value_in_point(const VariableSetPtr& vars) const
 //
 //
 {
-  /*auto a1 = dynamic_cast<Point*>(vars.get());
-  auto a = dyna*/
   return m_objective(vars);
 }
 

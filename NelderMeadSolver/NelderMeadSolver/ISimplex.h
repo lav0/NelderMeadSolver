@@ -19,4 +19,10 @@ public:
   virtual VariableSetPtr get_gravity_centre() const = 0;
 
   virtual ~ISimplex() {}
-};  
+
+  static constexpr double alfa() { return 1.0; }
+  static constexpr double gamma() { return 2.0; }
+  static constexpr double rho() { return -0.5; }
+  static constexpr double sigma() { return 0.5; }
+};
+

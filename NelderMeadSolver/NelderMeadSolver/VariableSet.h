@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <cassert>
 #include <vector>
 #include <memory>
 
@@ -9,49 +9,27 @@ class IVariableSet
 public:
 
   virtual size_t size() const = 0;
-  virtual double getVar(size_t index) const = 0;
+  virtual double get_var(size_t index) const = 0;
           
   virtual ~IVariableSet() {}
 };
+
 using VariableSetPtr = std::unique_ptr<IVariableSet>;
 
-template<size_t Dimension>
-struct VariableSet
+
+class VariableSetGeneric : public IVariableSet
 {
-    using Var = VariableSet<Dimension>;
+public:
 
-    Var() {}
-    Var(double a_x, double a_y) { values_[0] = a_x; values_[1] = a_y; }
+  VariableSetGeneric();
+  ~VariableSetGeneric() {}
 
-    inline Var operator+(const Var& a) const
-    {
-        Var res; 
+  size_t size() const override;
+  double get_var(size_t index) const override;
 
-        for (size_t i = 0; i < Dimension; ++i)
-            res.values_[i] = this->values_[i] + a.values_[i];
+  void push_back(double value);
 
-        return res;
-    }
-    inline Var operator-(const Var& a) const
-    {
-        Var res;
+private:
 
-        for (size_t i = 0; i < Dimension; ++i)
-            res.values_[i] = this->values_[i] - a.values_[i];
-
-        return res;
-    }
-    inline Var operator*(double c) const
-    {
-        Var res;
-
-        for (size_t i = 0; i < Dimension; ++i)
-            res.values_[i] = this->values_[i] * c;
-
-        return res;
-    }
-
-    std::array<double, Dimension> values_;
+  std::vector<double> vars_;
 };
-
-
