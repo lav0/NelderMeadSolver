@@ -15,8 +15,9 @@ SimplexTriple::SimplexTriple(
   const Point& a_p2, 
   const Point& a_p3
 ):  
-  m_objective_function(obj_function),
+  m_objective(obj_function),
   m_1(a_p1), m_2(a_p2), m_3(a_p3), 
+  m_bounds(0,0,0,0),
   m_b_points_ordered(false), 
   m_b_centroid_calculated(false), 
   m_b_deviation_calculated(false),
@@ -47,14 +48,14 @@ double SimplexTriple::value_in_point(const VariableSetPtr& vars) const
 {
   /*auto a1 = dynamic_cast<Point*>(vars.get());
   auto a = dyna*/
-  return m_objective_function(vars);
+  return m_objective(vars);
 }
 
 //=============================================================================
 double SimplexTriple::value_in_point(const Point& p) const
 {
   auto vars = (VariableSetPtr) std::make_unique<Point>(p);
-  return m_objective_function(vars);
+  return m_objective(vars);
 }
 
 //=============================================================================
@@ -224,7 +225,9 @@ VariableSetPtr SimplexTriple::reflection()
 //
 //
 {
-  return std::make_unique<Point>(general_move(alfa()));  
+  auto point = general_move(alfa());
+  m_bounds.check(point);
+  return std::make_unique<Point>(point);
 }
 
 //=============================================================================
@@ -233,7 +236,9 @@ VariableSetPtr SimplexTriple::expansion()
 //
 //
 {
-  return std::make_unique<Point>(general_move(gamma()));
+  auto point = general_move(gamma());
+  m_bounds.check(point);
+  return std::make_unique<Point>(point);
 }
 
 //=============================================================================
@@ -246,7 +251,7 @@ VariableSetPtr SimplexTriple::contraction()
 }
 
 //=============================================================================
-void SimplexTriple::reduce()
+void SimplexTriple::shrink()
 //
 // first - best point
 // second - second after best...etc
@@ -319,4 +324,9 @@ VariableSetPtr SimplexTriple::get_gravity_centre() const
 {
   double coef = 1.0 / 3.0;
   return std::make_unique<Point>(coef * (m_1 + m_2 + m_3));
+}
+
+VariableSetPtr SimplexTriple::start_position() const
+{
+  return std::make_unique<Point>(m_bounds.middle_x(), m_bounds.middle_y());
 }

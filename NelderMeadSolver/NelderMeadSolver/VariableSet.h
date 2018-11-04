@@ -7,8 +7,11 @@
 class IVariableSet
 {
 public:
-        
-    virtual ~IVariableSet() {}
+
+  virtual size_t size() const = 0;
+  virtual double getVar(size_t index) const = 0;
+          
+  virtual ~IVariableSet() {}
 };
 using VariableSetPtr = std::unique_ptr<IVariableSet>;
 

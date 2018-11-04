@@ -5,145 +5,111 @@
 
 //=============================================================================
 Solver::Solver(
-  std::function<double(const VariableSetPtr&)> obj_fnc,
-  double xmin, double xmax, double ymin, double ymax
+  std::function<double(const VariableSetPtr&)> objective
 ) :
-  m_bounds(xmin, xmax, ymin, ymax),
-  m_objective_function(obj_fnc),
+  m_objective(objective),
   m_found(false),
-  m_found_solution(nullptr)
+  m_found_solution(nullptr),
+  m_found_value(DBL_MAX)
 //
 //
 //
 {
-  m_found_solution = std::make_unique<Point>(m_bounds.middle_x(), m_bounds.middle_y());
-  m_found_value = m_objective_function(m_found_solution);
-}
-   
+}   
 
 //=============================================================================
 bool Solver::internal_solve_cycle(
-  double a_tolerance,  
-  eArea a_area
+  double a_tolerance
 )
 //
 //
 //
-{    
-  Point p1(0,0), p2(0,0), p3(0,0);
+{ 
+  auto simplex = m_simplex_queue.front();
+  m_simplex_queue.pop();
 
-  bool bounds_are_good = m_bounds.build_triangle_on_area(a_area, p1, p2, p3);
+  while (simplex->get_deviation() > a_tolerance) {
 
-  if (!bounds_are_good) {
-    return false;
-  }
+    VariableSetPtr refl_ptr = simplex->reflection();
     
-  auto a_simplex = getSimplex(p1, p2, p3);
+    double refl_val = simplex->value_in_point(refl_ptr);
 
-  while (a_simplex->get_deviation() > a_tolerance) {
-
-    VariableSetPtr refl_ptr = a_simplex->reflection();
-    Point* pptr = dynamic_cast<Point*>(refl_ptr.get());
-    
-    m_bounds.check(*pptr);
-
-    double refl_val = a_simplex->value_in_point(refl_ptr);
-
-    if (refl_val < a_simplex->minimum_value()) {
+    if (refl_val < simplex->minimum_value()) {
         
-      VariableSetPtr expn_ptr = a_simplex->expansion();
-      Point* pptr = dynamic_cast<Point*>(expn_ptr.get());
-
-      m_bounds.check(*pptr);
-
-      double expn_val = a_simplex->value_in_point(expn_ptr);
+      VariableSetPtr expn_ptr = simplex->expansion();
+      
+      double expn_val = simplex->value_in_point(expn_ptr);
 
       if (expn_val < refl_val)
       {
-        a_simplex->replace_maximum(expn_ptr);
+        simplex->replace_maximum(expn_ptr);
       }
       else
       {
-        a_simplex->replace_maximum(refl_ptr);
+        simplex->replace_maximum(refl_ptr);
       }
     
-    } else if (refl_val < a_simplex->middle_value()) 
+    } else if (refl_val < simplex->middle_value()) 
     {
-      a_simplex->replace_maximum(refl_ptr);
+      simplex->replace_maximum(refl_ptr);
     } 
     else 
     { 
+      VariableSetPtr contr_ptr = simplex->contraction();
 
-      VariableSetPtr contr_ptr = a_simplex->contraction();
+      double contr_val = simplex->value_in_point(contr_ptr);
 
-      double contr_val = a_simplex->value_in_point(contr_ptr);
-
-      if (contr_val < a_simplex->maximum_value()) 
+      if (contr_val < simplex->maximum_value()) 
       {
-        a_simplex->replace_maximum(contr_ptr);
+        simplex->replace_maximum(contr_ptr);
       }
       else
       {
-        a_simplex->reduce();
+        simplex->shrink();
       }
-
     }
   }
   
-  auto centre = a_simplex->get_gravity_centre();
-  double value = a_simplex->value_in_point(centre);
+  auto centre = simplex->get_gravity_centre();
+  double value = simplex->value_in_point(centre);
 
-  m_mutex.lock();
-
-  if (m_found_value > value) {
+  if (m_found_value > value)
+  {
+    std::lock_guard<std::mutex> guard(m_mutex);
 
     m_found = true;
     m_found_value = value;
     m_found_solution = std::move(centre);
-  
   }
-
-  m_mutex.unlock();
 
   return true;
 }
 
 //=============================================================================
-std::unique_ptr<ISimplex> Solver::getSimplex(const Point & a_p1, const Point & a_p2, const Point & a_p3) const
+void Solver::addSimplex(ISimplex * simplex)
 //
 //
 //
 {
-    return std::unique_ptr<SimplexTriple>(
-        new SimplexTriple(
-            m_objective_function,
-            a_p1, a_p2, a_p3
-        )
-    );
+  m_simplex_queue.push(simplex);
 }
 
 //=============================================================================
 bool Solver::solve(
   bool            a_multithreading,
   double          a_tolerance,
-  Point& a_output,
+  VariableSetPtr& a_output,
   double&         a_value
 )
 //
 //
 //
 {
-  /*if (nullptr == a_output)
-    return false;
-*/
-  if (!m_bounds.is_defined())
-     return false;
-    
   if (a_multithreading) {
-    std::thread thread1(&Solver::internal_solve_cycle, this, a_tolerance, eArea::SW);
-    std::thread thread2(&Solver::internal_solve_cycle, this, a_tolerance, eArea::SE);
-    std::thread thread3(&Solver::internal_solve_cycle, this, a_tolerance, eArea::NW);
-    std::thread thread4(&Solver::internal_solve_cycle, this, a_tolerance, eArea::NE);
+    std::thread thread1(&Solver::internal_solve_cycle, this, a_tolerance);
+    std::thread thread2(&Solver::internal_solve_cycle, this, a_tolerance);
+    std::thread thread3(&Solver::internal_solve_cycle, this, a_tolerance);
+    std::thread thread4(&Solver::internal_solve_cycle, this, a_tolerance);
 
     thread1.join();
     thread2.join();
@@ -152,14 +118,14 @@ bool Solver::solve(
   } 
   else 
   {
-    internal_solve_cycle(a_tolerance, eArea::CENTRAL);
+    internal_solve_cycle(a_tolerance);
   }
 
   if (!m_found)
     return false;
 
   auto* point = dynamic_cast<Point*>(m_found_solution.get());
-  a_output = *point;
+  a_output = std::make_unique<Point>(*point);
   a_value = m_found_value;
 
   return true;

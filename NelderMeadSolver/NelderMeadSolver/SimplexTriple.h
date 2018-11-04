@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Point.h"
+#include "Bounds.h"
 #include "ISimplex.h"
 #include <memory>
 #include <mutex>
@@ -10,10 +11,10 @@
 #include <algorithm>
 #include <assert.h>
 
-static double alfa() { return 1.0; }
-static double gamma() { return 2.0; }
-static double rho()  { return -0.5; }
-static double sigma() { return 0.5; }
+static constexpr double alfa() { return 1.0; }
+static constexpr double gamma() { return 2.0; }
+static constexpr double rho()  { return -0.5; }
+static constexpr double sigma() { return 0.5; }
 
 
 
@@ -30,6 +31,8 @@ public:
 
   ~SimplexTriple() override {}
 
+  void setBounds(const Bounds& bounds) { m_bounds = bounds; }
+
   const Point& minimum() const;
   const Point& middle() const;
   const Point& maximum() const;
@@ -42,12 +45,13 @@ public:
 
   Point get_centroid();
   VariableSetPtr get_gravity_centre() const override;
+  VariableSetPtr start_position() const override;
 
   VariableSetPtr reflection() override;
   VariableSetPtr expansion() override;
   VariableSetPtr contraction() override;
 
-  void reduce() override;
+  void shrink() override;
   
   double value_in_point(const VariableSetPtr& a) const override;
   double value_in_point(const Point& p) const;
@@ -66,9 +70,11 @@ private:
 
 private:
   
-  std::function<double(const VariableSetPtr&)> m_objective_function;
+  std::function<double(const VariableSetPtr&)> m_objective;
 
   Point m_1, m_2, m_3;
+
+  Bounds m_bounds;
 
   mutable const Point * m_p_min;
   mutable const Point * m_p_mid;

@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "VariableSet.h"
-
+#include <functional>
 
 //struct Point
 //{
@@ -23,7 +23,12 @@ struct Point : public IVariableSet
         Y = p.Y;
         return *this; 
     }
-    
+
+    size_t size() const override { return 2; }
+    virtual double getVar(size_t index) const override {
+      return index == 0 ? X : Y;
+    }
+
     double X;
     double Y;
 };
