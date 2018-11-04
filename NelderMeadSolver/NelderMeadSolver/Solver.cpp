@@ -5,7 +5,7 @@
 
 //=============================================================================
 Solver::Solver(
-  std::function<double(const VariableSetPtr&)> objective
+  std::function<double(const IVariableSetUPtr&)> objective
 ) :
   m_objective(objective),
   m_found(false),
@@ -30,13 +30,13 @@ bool Solver::internal_solve_cycle(
 
   while (simplex->get_deviation() > a_tolerance) {
 
-    VariableSetPtr refl_ptr = simplex->reflection();
+    IVariableSetUPtr refl_ptr = simplex->reflection();
     
     double refl_val = simplex->value_in_point(refl_ptr);
 
     if (refl_val < simplex->minimum_value()) {
         
-      VariableSetPtr expn_ptr = simplex->expansion();
+      IVariableSetUPtr expn_ptr = simplex->expansion();
       
       double expn_val = simplex->value_in_point(expn_ptr);
 
@@ -55,7 +55,7 @@ bool Solver::internal_solve_cycle(
     } 
     else 
     { 
-      VariableSetPtr contr_ptr = simplex->contraction();
+      IVariableSetUPtr contr_ptr = simplex->contraction();
 
       double contr_val = simplex->value_in_point(contr_ptr);
 
@@ -98,7 +98,7 @@ void Solver::addSimplex(ISimplex * simplex)
 bool Solver::solve(
   bool            a_multithreading,
   double          a_tolerance,
-  VariableSetPtr& a_output,
+  IVariableSetUPtr& a_output,
   double&         a_value
 )
 //

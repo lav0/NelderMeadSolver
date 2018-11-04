@@ -18,7 +18,7 @@ class SimplexTriple : public ISimplex
 public:
 
   SimplexTriple(
-    std::function<double(const VariableSetPtr&)> obj_function,
+    std::function<double(const IVariableSetUPtr&)> obj_function,
     const Point& a_p1, 
     const Point& a_p2, 
     const Point& a_p3
@@ -36,19 +36,18 @@ public:
   const double middle_value() const override;
   const double maximum_value() const override;
 
-  void replace_maximum(const VariableSetPtr& a_new_point) override;
+  void replace_maximum(const IVariableSetUPtr& a_new_point) override;
 
   Point get_centroid();
-  VariableSetPtr get_gravity_centre() const override;
-  VariableSetPtr start_position() const override;
+  IVariableSetUPtr get_gravity_centre() const override;
 
-  VariableSetPtr reflection() override;
-  VariableSetPtr expansion() override;
-  VariableSetPtr contraction() override;
+  IVariableSetUPtr reflection() override;
+  IVariableSetUPtr expansion() override;
+  IVariableSetUPtr contraction() override;
 
   void shrink() override;
   
-  double value_in_point(const VariableSetPtr& a) const override;
+  double value_in_point(const IVariableSetUPtr& a) const override;
   double value_in_point(const Point& p) const;
 
   double get_deviation() const override;
@@ -65,7 +64,7 @@ private:
 
 private:
   
-  std::function<double(const VariableSetPtr&)> m_objective;
+  std::function<double(const IVariableSetUPtr&)> m_objective;
 
   Point m_1, m_2, m_3;
 

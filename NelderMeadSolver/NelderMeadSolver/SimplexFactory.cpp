@@ -2,7 +2,7 @@
 #include "SimplexFactory.h"
 
 std::unique_ptr<SimplexTriple> SimplexFactory::simplexTriple(
-  std::function<double(const VariableSetPtr&)> obj_function, 
+  std::function<double(const IVariableSetUPtr&)> obj_function, 
   const Bounds& bounds,
   eArea a_area)
 {

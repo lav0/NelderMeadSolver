@@ -14,10 +14,10 @@ double VariableSetGeneric::get_var(size_t index) const
 {
   assert(index < size());
 
-  return vars_[index];
+  return vars_[index].get();
 }
 
-void VariableSetGeneric::push_back(double value)
+void VariableSetGeneric::push_back(ValueWrapperDouble value)
 {
   vars_.push_back(value);
 }
