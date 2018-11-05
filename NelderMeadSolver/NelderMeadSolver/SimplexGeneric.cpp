@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SimplexGeneric.h"
 
+using namespace nmsolver;
+
 SimplexGeneric::SimplexGeneric(size_t simplex_size)
   :expected_size_(simplex_size)
 {
@@ -9,7 +11,35 @@ SimplexGeneric::SimplexGeneric(size_t simplex_size)
 
 double SimplexGeneric::get_deviation() const
 {
-  return 0.0;
+  auto p = get_gravity_centre();
+  auto grav_centre = dynamic_cast<VariableSetGeneric*>(p.get());
+
+  auto var0 = dynamic_cast<VariableSetGeneric*>(variables_[0].get());
+  auto var1 = dynamic_cast<VariableSetGeneric*>(variables_[1].get());
+  auto var2 = dynamic_cast<VariableSetGeneric*>(variables_[2].get());
+
+  VariableSetGeneric v0;
+
+  v0.push_back((TheWrapper)(var0->get_var(0) - p->get_var(0)));
+  v0.push_back((TheWrapper)(var0->get_var(1) - p->get_var(1)));
+
+  auto len0 = length(&v0);
+
+  VariableSetGeneric v1;
+
+  v1.push_back((TheWrapper)(var1->get_var(0) - p->get_var(0)));
+  v1.push_back((TheWrapper)(var1->get_var(1) - p->get_var(1)));
+
+  auto len1 = length(&v1);
+
+  VariableSetGeneric v2;
+
+  v2.push_back((TheWrapper)(var2->get_var(0) - p->get_var(0)));
+  v2.push_back((TheWrapper)(var2->get_var(1) - p->get_var(1)));
+
+  auto len2 = length(&v2);
+
+  return std::max(len0, std::max(len1, len2));
 }
 
 IVariableSetUPtr SimplexGeneric::reflection()

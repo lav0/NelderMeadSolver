@@ -1,9 +1,10 @@
 #pragma once
 
 #include "stdafx.h"
-#include "VariableSet.h"
+#include "IVariableSet.h"
 #include <functional>
 
+using namespace nmsolver;
 //struct Point
 //{
 //  Point(double a_x, double a_y);
@@ -27,6 +28,7 @@ struct Point : public IVariableSet
     virtual double get_var(size_t index) const override {
       return index == 0 ? X : Y;
     }
+    std::unique_ptr<IVariableSet> operator-(const IVariableSet* a) const override;
 
     double X;
     double Y;

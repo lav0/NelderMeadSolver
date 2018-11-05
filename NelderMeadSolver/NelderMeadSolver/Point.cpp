@@ -6,6 +6,12 @@
 //=============================================================================
 Point::Point(double a_x, double a_y) : X(a_x), Y(a_y) {}
 
+std::unique_ptr<IVariableSet> Point::operator-(const IVariableSet * a) const
+{
+  auto p = dynamic_cast<const Point*>(a);
+  return std::make_unique<Point>(*this - *p);
+}
+
 //=============================================================================
 Point operator+(const Point& a, const Point& b)
 {

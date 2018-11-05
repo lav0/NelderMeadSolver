@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ISimplex.h"
-#include "VariableSet.h"
+#include "VariableSetGeneric.h"
 
 class SimplexGeneric : public ISimplex
 {
