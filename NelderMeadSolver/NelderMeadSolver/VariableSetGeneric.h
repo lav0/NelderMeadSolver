@@ -4,40 +4,82 @@
 
 namespace nmsolver
 {
+  template<typename TYPE>
   class VariableSetGeneric : public IVariableSet
   {
   public:
 
-    VariableSetGeneric();
+    typedef typename TYPE _type;
+
+    VariableSetGeneric(size_t size) : vars_(size, TYPE(0)) {}
     ~VariableSetGeneric() {}
 
-    size_t size() const override;
-    double get_var(size_t index) const override;
+    size_t size() const override
+    {
+      return vars_.size();
+    }
 
-    std::unique_ptr<IVariableSet> operator-(const IVariableSet*) const override;
+    double get_var(size_t index) const override
+    {
+      assert(index < size());
 
-    void push_back(ValueWrapperDouble value);
+      return vars_[index].get();
+    }
 
+    std::unique_ptr<IVariableSet> subtract(const IVariableSet* other) const override
+    {
+      assert(size() == other->size());
+
+      auto ret = std::make_unique<VariableSetGeneric<TYPE>>(size());
+
+      for (size_t i = 0; i < size(); ++i)
+      {
+        double d = get_var(i) - other->get_var(i);
+        ret->set_var(i, d);
+      }
+
+      return ret;
+    }
+
+    std::unique_ptr<IVariableSet> add(const IVariableSet* other) const override
+    {
+      assert(size() == other->size());
+
+      auto ret = std::make_unique<VariableSetGeneric<TYPE>>(size());
+
+      for (size_t i = 0; i < size(); ++i)
+      {
+        double d = get_var(i) + other->get_var(i);
+        ret->set_var(i, d);
+      }
+
+      return ret;
+    }
+
+    void set_var(size_t index, double value)
+    {
+      vars_[index].set(value);
+    }
+
+    void set_gut(size_t index, const TYPE& gut)
+    {
+      vars_[index] = gut;
+    }
+
+    TYPE& get_gut(size_t index)
+    {
+      return vars_[index];
+    }
+    
   private:
 
-    std::vector<ValueWrapperDouble> vars_;
+    std::vector<TYPE> vars_;
   };
 
-  inline double squared_length(const IVariableSet* a)
-  {
-    double sum = 0;
-    auto size = a->size();
-    for (decltype(size) i = 0; i < size; ++i)
-    {
-      auto value = a->get_var(i);
-      sum += value * value;
-    }
-    return sum;
-  }
-  inline double length(const IVariableSet* a)
-  {
-    return sqrt(squared_length(a));
-  }
 }
 
-using VariableSetGenericPtr = std::unique_ptr<nmsolver::VariableSetGeneric>;
+using VariableSetDoublePtr = std::unique_ptr<
+  nmsolver::VariableSetGeneric<
+    nmsolver::ValueWrapperDouble
+  >
+>;

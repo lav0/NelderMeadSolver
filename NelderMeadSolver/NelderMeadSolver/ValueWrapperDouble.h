@@ -19,6 +19,5 @@ namespace nmsolver
   private:
     double d_ = 0.0;
   };
-  using TheWrapper = ValueWrapperDouble;
 
 }

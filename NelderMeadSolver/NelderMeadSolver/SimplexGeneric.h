@@ -3,11 +3,18 @@
 #include "ISimplex.h"
 #include "VariableSetGeneric.h"
 
+template<typename INNER_TYPE>
 class SimplexGeneric : public ISimplex
 {
 public:
 
-  SimplexGeneric(size_t simplex_size);
+  using Simplex = SimplexGeneric<INNER_TYPE>;
+  using T = INNER_TYPE;
+
+  SimplexGeneric(
+    std::function<double(const IVariableSet*)> obj_function,
+    size_t simplex_size
+    );
   ~SimplexGeneric() override {}
 
   double get_deviation() const override;
@@ -20,7 +27,8 @@ public:
   const double middle_value() const override;
   const double maximum_value() const override;
   void replace_maximum(const IVariableSetUPtr& a_new_point) override;
-  IVariableSetUPtr get_gravity_centre() const;
+  IVariableSetUPtr get_gravity_centre() const override;
+  IVariableSetUPtr get_centroid();
 
   bool addVariableSet(IVariableSetSPtr& varset);
   size_t simplex_size() const;
@@ -29,7 +37,12 @@ public:
 
 private:
 
+  std::function<double(const IVariableSet*)> objective_;
   size_t expected_size_;
 
   std::vector<IVariableSetSPtr> variables_;
+
+  IVariableSetUPtr centroid_;
 };
+
+using SimplexGenericDouble = SimplexGeneric<ValueWrapperDouble>;

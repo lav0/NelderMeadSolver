@@ -28,7 +28,8 @@ struct Point : public IVariableSet
     virtual double get_var(size_t index) const override {
       return index == 0 ? X : Y;
     }
-    std::unique_ptr<IVariableSet> operator-(const IVariableSet* a) const override;
+    std::unique_ptr<IVariableSet> subtract(const IVariableSet* a) const override;
+    std::unique_ptr<IVariableSet> add(const IVariableSet*) const override;
 
     double X;
     double Y;
